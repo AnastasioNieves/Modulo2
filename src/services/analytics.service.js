@@ -14,7 +14,7 @@ async function tasaAptosPorCampus() {
     { $unwind: '$proyecto' },
     {
       $lookup: {
-        from: 'promocions',
+        from: 'promociones',
         localField: 'proyecto.promocion',
         foreignField: '_id',
         as: 'promocion'
@@ -86,7 +86,7 @@ async function alumnosEnRiesgo({ threshold = 60, minNoAptos = 2 } = {}) {
     { $unwind: '$alumno' },
     {
       $lookup: {
-        from: 'promocions',
+        from: 'promociones',
         localField: 'alumno.promocion',
         foreignField: '_id',
         as: 'promocion'
@@ -141,7 +141,7 @@ async function rankingProyectosNoAptos({ limit = 10 } = {}) {
     { $unwind: '$proyecto' },
     {
       $lookup: {
-        from: 'profesors',
+        from: 'profesores',
         localField: 'proyecto.profesor',
         foreignField: '_id',
         as: 'profesor'
