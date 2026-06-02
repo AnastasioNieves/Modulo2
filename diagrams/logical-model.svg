@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1080" viewBox="0 0 1280 1080" role="img" aria-labelledby="title desc">
+  <title id="title">AprenTIC Campus API - MongoDB Logical Model</title>
+  <desc id="desc">Logical MongoDB model showing collections, main indexes, access rules and aggregation endpoints.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f5f7f6; }
+      .panel { fill: #ffffff; stroke: #d4ded9; stroke-width: 1.4; rx: 8; }
+      .panel-alt { fill: #f8faf9; stroke: #d4ded9; stroke-width: 1.4; rx: 8; }
+      .head { fill: #123127; rx: 8; }
+      .head-blue { fill: #245caa; rx: 8; }
+      .head-gold { fill: #9a6200; rx: 8; }
+      .title { fill: #ffffff; font: 700 15px Arial, sans-serif; }
+      .h1 { fill: #17211d; font: 800 26px Arial, sans-serif; }
+      .h2 { fill: #17211d; font: 800 17px Arial, sans-serif; }
+      .text { fill: #24302b; font: 13px Arial, sans-serif; }
+      .muted { fill: #66746e; font: 12px Arial, sans-serif; }
+      .index { fill: #176b4d; font: 700 12px Arial, sans-serif; }
+      .line { stroke: #176b4d; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .line-blue { stroke: #245caa; stroke-width: 2; fill: none; marker-end: url(#arrowBlue); }
+      .chip { fill: #e3edf9; stroke: #bdd2ef; rx: 12; }
+      .chip-text { fill: #245caa; font: 700 12px Arial, sans-serif; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#176b4d" />
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#245caa" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1280" height="1080" />
+  <text x="48" y="46" class="h1">AprenTIC Campus API - Modelo logico MongoDB Atlas</text>
+  <text x="48" y="72" class="muted">Base de datos NoSQL: colecciones, documentos, referencias ObjectId, indices y agregaciones.</text>
+
+  <g transform="translate(48 112)">
+    <rect class="panel" width="300" height="214" />
+    <rect class="head" width="300" height="42" />
+    <text class="title" x="16" y="27">Colecciones core</text>
+    <text class="h2" x="16" y="72">campus</text>
+    <text class="text" x="16" y="98">nombre, ciudad, direccion</text>
+    <text class="index" x="16" y="122">idx: nombre unique, ciudad+nombre</text>
+    <text class="h2" x="16" y="156">promociones</text>
+    <text class="text" x="16" y="182">codigo, modalidad, campus</text>
+    <text class="index" x="16" y="206">idx: codigo unique, campus+codigo</text>
+  </g>
+
+  <g transform="translate(390 112)">
+    <rect class="panel" width="300" height="214" />
+    <rect class="head" width="300" height="42" />
+    <text class="title" x="16" y="27">Colecciones personas</text>
+    <text class="h2" x="16" y="72">profesores</text>
+    <text class="text" x="16" y="98">email, campus, promociones[]</text>
+    <text class="index" x="16" y="122">idx: email unique, campus+email</text>
+    <text class="h2" x="16" y="156">alumnos</text>
+    <text class="text" x="16" y="182">email, promocion, estado, fotoUrl</text>
+    <text class="index" x="16" y="206">idx: email unique, promocion+email</text>
+  </g>
+
+  <g transform="translate(732 112)">
+    <rect class="panel" width="300" height="214" />
+    <rect class="head" width="300" height="42" />
+    <text class="title" x="16" y="27">Colecciones evaluacion</text>
+    <text class="h2" x="16" y="72">proyectos</text>
+    <text class="text" x="16" y="98">nombre, modulo, promocion, profesor</text>
+    <text class="index" x="16" y="122">idx: promocion+profesor+nombre</text>
+    <text class="h2" x="16" y="156">notas</text>
+    <text class="text" x="16" y="182">alumno, proyecto, profesor, score, apto</text>
+    <text class="index" x="16" y="206">unique: alumno+proyecto</text>
+  </g>
+
+  <g transform="translate(1074 112)">
+    <rect class="panel" width="158" height="214" />
+    <rect class="head-blue" width="158" height="42" />
+    <text class="title" x="16" y="27">Auth</text>
+    <text class="h2" x="16" y="72">users</text>
+    <text class="text" x="16" y="98">email</text>
+    <text class="text" x="16" y="122">passwordHash</text>
+    <text class="text" x="16" y="146">role</text>
+    <text class="text" x="16" y="170">profesor?</text>
+    <text class="text" x="16" y="194">alumno?</text>
+  </g>
+
+  <path class="line" d="M348 178 H390" />
+  <path class="line" d="M690 178 H732" />
+  <path class="line-blue" d="M1032 178 H1074" />
+  <path class="line" d="M540 326 V388" />
+  <path class="line" d="M882 326 V388" />
+
+  <g transform="translate(48 388)">
+    <rect class="panel-alt" width="1184" height="152" />
+    <rect class="head-gold" width="1184" height="42" />
+    <text class="title" x="16" y="27">Reglas de autorizacion</text>
+    <text class="h2" x="24" y="76">admin</text>
+    <text class="text" x="120" y="76">CRUD completo sobre documentos, soft delete, uploads, analiticas y gestion de notas.</text>
+    <text class="h2" x="24" y="108">profesor</text>
+    <text class="text" x="120" y="108">Lee alumnos/promociones/proyectos y crea o modifica solo notas de sus proyectos.</text>
+    <text class="h2" x="24" y="140">alumno</text>
+    <text class="text" x="120" y="140">Consulta solo sus propias notas mediante el usuario vinculado.</text>
+  </g>
+
+  <g transform="translate(48 566)">
+    <rect class="panel-alt" width="1184" height="126" />
+    <rect class="head-blue" width="1184" height="42" />
+    <text class="title" x="16" y="27">Relaciones cruzadas documentales</text>
+    <text class="h2" x="24" y="76">notas</text>
+    <text class="text" x="112" y="76">alumno + proyecto + profesor: coleccion puente para evaluaciones y permisos.</text>
+    <text class="h2" x="650" y="76">proyectos</text>
+    <text class="text" x="746" y="76">promocion + profesor: contexto academico y responsable docente.</text>
+    <text class="h2" x="24" y="108">users</text>
+    <text class="text" x="112" y="108">auth + profesor/alumno opcional: vincula JWT con permisos del dominio.</text>
+    <text class="h2" x="650" y="108">profesores</text>
+    <text class="text" x="746" y="108">campus + promociones[]: docente en sede y varias cohortes.</text>
+  </g>
+
+  <g transform="translate(48 734)">
+    <rect class="panel" width="360" height="224" />
+    <rect class="head" width="360" height="42" />
+    <text class="title" x="16" y="27">Agregacion 1</text>
+    <text class="h2" x="16" y="76">tasa-aptos-campus</text>
+    <text class="text" x="16" y="106">notas -> proyectos -> promociones -> campus</text>
+    <text class="text" x="16" y="136">group por campus</text>
+    <text class="text" x="16" y="166">totalNotas, totalAptos</text>
+    <text class="index" x="16" y="196">resultado: tasaAptos porcentual</text>
+  </g>
+
+  <g transform="translate(460 734)">
+    <rect class="panel" width="360" height="224" />
+    <rect class="head" width="360" height="42" />
+    <text class="title" x="16" y="27">Agregacion 2</text>
+    <text class="h2" x="16" y="76">alumnos-riesgo</text>
+    <text class="text" x="16" y="106">notas -> alumnos -> promociones -> campus</text>
+    <text class="text" x="16" y="136">group por alumno</text>
+    <text class="text" x="16" y="166">media y numero de no aptos</text>
+    <text class="index" x="16" y="196">filtro: media baja o minNoAptos</text>
+  </g>
+
+  <g transform="translate(872 734)">
+    <rect class="panel" width="360" height="224" />
+    <rect class="head" width="360" height="42" />
+    <text class="title" x="16" y="27">Agregacion 3</text>
+    <text class="h2" x="16" y="76">ranking-proyectos-no-aptos</text>
+    <text class="text" x="16" y="106">notas apto=false -> proyectos -> profesores</text>
+    <text class="text" x="16" y="136">group por proyecto</text>
+    <text class="text" x="16" y="166">noAptos y mediaSuspensos</text>
+    <text class="index" x="16" y="196">sort: noAptos desc</text>
+  </g>
+
+  <path class="line-blue" d="M228 692 V734" />
+  <path class="line-blue" d="M640 692 V734" />
+  <path class="line-blue" d="M1052 692 V734" />
+
+  <g transform="translate(48 1010)">
+    <rect class="chip" width="282" height="32" />
+    <text class="chip-text" x="14" y="21">Todos los documentos usan deletedAt</text>
+  </g>
+  <g transform="translate(348 1010)">
+    <rect class="chip" width="302" height="32" />
+    <text class="chip-text" x="14" y="21">JWT protege rutas privadas</text>
+  </g>
+  <g transform="translate(668 1010)">
+    <rect class="chip" width="368" height="32" />
+    <text class="chip-text" x="14" y="21">Agregaciones $lookup con ObjectId e indices</text>
+  </g>
+</svg>

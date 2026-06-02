@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">AprenTIC Campus API - Modelo documental MongoDB Atlas</title>
+  <desc id="desc">Diagrama conceptual NoSQL con colecciones, documentos y referencias ObjectId para MongoDB Atlas.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f5f7f6}.doc{fill:#fff;stroke:#cfdad5;stroke-width:1.5;rx:8}.head{fill:#123127;rx:8}.auth{fill:#245caa;rx:8}
+      .h{fill:#fff;font:700 16px Arial,sans-serif}.t{fill:#24302b;font:13px Arial,sans-serif}.k{fill:#176b4d;font:700 13px Arial,sans-serif}
+      .m{fill:#66746e;font:12px Arial,sans-serif}.title{fill:#17211d;font:800 26px Arial,sans-serif}.rel{stroke:#176b4d;stroke-width:2.2;fill:none;marker-end:url(#arrow)}
+      .opt{stroke:#245caa;stroke-width:2;stroke-dasharray:7 5;fill:none;marker-end:url(#arrowBlue)}.label{fill:#17211d;font:700 12px Arial,sans-serif}
+      .chip{fill:#e3edf9;stroke:#bdd2ef;rx:12}.chipText{fill:#245caa;font:700 12px Arial,sans-serif}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#176b4d"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#245caa"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1280" height="900"/>
+  <text x="48" y="46" class="title">AprenTIC Campus API - Modelo documental MongoDB Atlas</text>
+  <text x="48" y="74" class="m">Base de datos NoSQL con colecciones independientes, referencias ObjectId, indices y agregaciones.</text>
+
+  <g transform="translate(48 118)">
+    <rect class="doc" width="252" height="188"/><rect class="head" width="252" height="42"/>
+    <text class="h" x="16" y="27">campus</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">nombre unique</text>
+    <text class="t" x="16" y="116">ciudad</text>
+    <text class="t" x="16" y="140">direccion</text>
+    <text class="t" x="16" y="164">deletedAt</text>
+  </g>
+
+  <g transform="translate(390 118)">
+    <rect class="doc" width="270" height="220"/><rect class="head" width="270" height="42"/>
+    <text class="h" x="16" y="27">promociones</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">codigo unique</text>
+    <text class="t" x="16" y="116">nombre, modalidad</text>
+    <text class="k" x="16" y="140">campus ObjectId ref</text>
+    <text class="t" x="16" y="164">fechaInicio, fechaFin</text>
+    <text class="t" x="16" y="188">deletedAt</text>
+  </g>
+
+  <g transform="translate(742 118)">
+    <rect class="doc" width="270" height="220"/><rect class="head" width="270" height="42"/>
+    <text class="h" x="16" y="27">profesores</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">email unique</text>
+    <text class="t" x="16" y="116">nombre, apellidos</text>
+    <text class="k" x="16" y="140">campus ObjectId ref</text>
+    <text class="k" x="16" y="164">promociones ObjectId[] refs</text>
+    <text class="t" x="16" y="188">especialidad, deletedAt</text>
+  </g>
+
+  <g transform="translate(1050 118)">
+    <rect class="doc" width="190" height="214"/><rect class="auth" width="190" height="42"/>
+    <text class="h" x="16" y="27">users</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">email unique</text>
+    <text class="t" x="16" y="116">passwordHash</text>
+    <text class="t" x="16" y="140">role</text>
+    <text class="k" x="16" y="164">profesor? ObjectId ref</text>
+    <text class="k" x="16" y="188">alumno? ObjectId ref</text>
+  </g>
+
+  <g transform="translate(390 446)">
+    <rect class="doc" width="270" height="212"/><rect class="head" width="270" height="42"/>
+    <text class="h" x="16" y="27">alumnos</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">email unique</text>
+    <text class="t" x="16" y="116">nombre, apellidos</text>
+    <text class="k" x="16" y="140">promocion ObjectId ref</text>
+    <text class="t" x="16" y="164">estado, fotoUrl</text>
+    <text class="t" x="16" y="188">deletedAt</text>
+  </g>
+
+  <g transform="translate(742 446)">
+    <rect class="doc" width="270" height="212"/><rect class="head" width="270" height="42"/>
+    <text class="h" x="16" y="27">proyectos</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="t" x="16" y="92">nombre, modulo</text>
+    <text class="t" x="16" y="116">descripcion</text>
+    <text class="k" x="16" y="140">promocion ObjectId ref</text>
+    <text class="k" x="16" y="164">profesor ObjectId ref</text>
+    <text class="t" x="16" y="188">fechaEntrega, deletedAt</text>
+  </g>
+
+  <g transform="translate(1050 446)">
+    <rect class="doc" width="190" height="246"/><rect class="head" width="190" height="42"/>
+    <text class="h" x="16" y="27">notas</text>
+    <text class="k" x="16" y="68">_id ObjectId</text>
+    <text class="k" x="16" y="92">alumno ObjectId ref</text>
+    <text class="k" x="16" y="116">proyecto ObjectId ref</text>
+    <text class="k" x="16" y="140">profesor ObjectId ref</text>
+    <text class="t" x="16" y="164">score 0..100</text>
+    <text class="t" x="16" y="188">apto, feedback</text>
+    <text class="t" x="16" y="212">actaUrl, deletedAt</text>
+    <text class="k" x="16" y="236">unique alumno+proyecto</text>
+  </g>
+
+  <path class="rel" d="M300 212 H390"/><text class="label" x="320" y="200">ref</text>
+  <path class="rel" d="M300 254 C454 394 578 392 742 208"/><text class="label" x="356" y="314">ref</text>
+  <path class="rel" d="M525 338 V446"/><text class="label" x="535" y="398">ref</text>
+  <path class="rel" d="M660 244 C702 260 714 286 742 310"/><text class="label" x="684" y="264">refs[]</text>
+  <path class="rel" d="M660 552 H742"/><text class="label" x="684" y="540">ref</text>
+  <path class="rel" d="M877 338 V446"/><text class="label" x="887" y="398">ref</text>
+  <path class="rel" d="M1012 552 H1050"/><text class="label" x="1018" y="540">ref</text>
+  <path class="rel" d="M660 626 C796 748 944 734 1050 650"/><text class="label" x="718" y="706">ref</text>
+  <path class="rel" d="M1012 252 C1122 294 1130 374 1144 446"/><text class="label" x="1030" y="276">ref</text>
+  <path class="opt" d="M1050 184 H1012"/><text class="label" x="1018" y="172">optional</text>
+  <path class="opt" d="M1148 332 C1098 420 766 384 660 510"/><text class="label" x="1062" y="390">optional</text>
+
+  <g transform="translate(48 722)">
+    <rect class="doc" width="1192" height="92"/>
+    <rect class="head" width="1192" height="34"/>
+    <text class="h" x="16" y="23">Relaciones cruzadas clave</text>
+    <text class="k" x="18" y="58">notas</text><text class="t" x="78" y="58">cruza alumno + proyecto + profesor para guardar la evaluacion sin duplicar documentos.</text>
+    <text class="k" x="18" y="80">proyectos</text><text class="t" x="96" y="80">cruza promocion + profesor; users cruza auth con profesor/alumno; profesores mantiene promociones[].</text>
+    <text class="k" x="730" y="58">analytics</text><text class="t" x="810" y="58">usa notas -> proyectos -> promociones -> campus con $lookup.</text>
+    <text class="k" x="730" y="80">permisos</text><text class="t" x="802" y="80">profesor solo modifica notas donde nota.profesor coincide con su usuario.</text>
+  </g>
+
+  <g transform="translate(48 840)">
+    <rect class="chip" width="360" height="32"/><text class="chipText" x="14" y="21">No hay tablas SQL: son colecciones MongoDB</text>
+  </g>
+  <g transform="translate(428 840)">
+    <rect class="chip" width="332" height="32"/><text class="chipText" x="14" y="21">Referencias por ObjectId + populate/$lookup</text>
+  </g>
+  <g transform="translate(780 840)">
+    <rect class="chip" width="314" height="32"/><text class="chipText" x="14" y="21">Indices unique y compuestos para filtros</text>
+  </g>
+</svg>

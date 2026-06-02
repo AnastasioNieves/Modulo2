@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | AprenTIC Campus</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="login-page">
+    <main class="login-window" aria-labelledby="loginTitle">
+      <section class="login-panel">
+        <div class="brand login-brand">
+          <div class="brand-mark">A</div>
+          <div>
+            <strong>AprenTIC</strong>
+            <span>Campus API</span>
+          </div>
+        </div>
+
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Acceso seguro</p>
+            <h1 id="loginTitle">Iniciar sesion</h1>
+          </div>
+          <span id="apiStatus" class="status-pill muted">API</span>
+        </div>
+
+        <form id="loginForm" class="login-form" method="post" action="/api/auth/login">
+          <label>
+            Email
+            <input id="email" type="email" autocomplete="username" required>
+          </label>
+          <label>
+            Password
+            <input id="password" type="password" autocomplete="current-password" required>
+          </label>
+
+          <button id="submitBtn" class="primary" type="submit">Entrar al panel</button>
+        </form>
+
+        <div class="quick-logins" aria-label="Usuarios demo">
+          <button type="button" data-login="admin">Admin</button>
+          <button type="button" data-login="profesor">Profesor</button>
+          <button type="button" data-login="alumno">Alumno</button>
+        </div>
+
+        <p id="loginMessage" class="message"></p>
+      </section>
+
+      <aside class="login-side">
+        <p class="eyebrow">Backend conectado</p>
+        <h2>La interfaz usa la API real del proyecto.</h2>
+        <p>
+          El login llama a <code>/api/auth/login</code> y el panel consume los endpoints protegidos con el JWT recibido.
+        </p>
+        <a class="ghost login-docs" href="/api-docs" target="_blank" rel="noreferrer">Abrir Swagger</a>
+      </aside>
+    </main>
+
+    <script src="/login.js"></script>
+  </body>
+</html>

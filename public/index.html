@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AprenTIC Campus Panel</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegacion principal">
+        <div class="brand">
+          <div class="brand-mark">A</div>
+          <div>
+            <strong>AprenTIC</strong>
+            <span>Campus API</span>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-section="dashboard" type="button">Dashboard</button>
+          <button class="nav-item" data-section="alumnos" type="button">Alumnos</button>
+          <button class="nav-item" data-section="proyectos" type="button">Proyectos</button>
+          <button class="nav-item" data-section="notas" type="button">Notas</button>
+          <button class="nav-item" data-section="demo" type="button">Demo roles</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a class="side-link" href="/api-docs" target="_blank" rel="noreferrer">Swagger UI</a>
+          <button id="refreshBtn" class="side-link button-reset" type="button">Actualizar datos</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Gestion academica multi-campus</p>
+            <h1>Panel de demo</h1>
+          </div>
+          <div class="session">
+            <span id="apiStatus" class="status-pill muted">API</span>
+            <span id="roleBadge" class="role-badge">Sesion</span>
+            <button id="logoutBtn" class="ghost" type="button">Salir</button>
+          </div>
+        </header>
+
+        <section id="appView" class="content">
+          <section class="section active" data-panel="dashboard">
+            <div class="metrics-grid">
+              <article class="metric-card">
+                <span>Alumnos</span>
+                <strong id="metricAlumnos">0</strong>
+                <small id="metricRiesgo">0 en riesgo</small>
+              </article>
+              <article class="metric-card">
+                <span>Proyectos</span>
+                <strong id="metricProyectos">0</strong>
+                <small id="metricNoAptos">0 no aptos</small>
+              </article>
+              <article class="metric-card">
+                <span>Tasa media</span>
+                <strong id="metricTasa">0%</strong>
+                <small>aptos por campus</small>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Aptos por campus</h2>
+                </div>
+                <div id="campusBars" class="bars"></div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Alumnos en riesgo</h2>
+                </div>
+                <div id="riskList" class="list-stack"></div>
+              </section>
+
+              <section class="panel wide">
+                <div class="panel-heading">
+                  <h2>Ranking de no aptos</h2>
+                </div>
+                <div id="projectRanking" class="ranking"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="section" data-panel="alumnos">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Listado</p>
+                <h2>Alumnos</h2>
+              </div>
+              <input id="studentSearch" class="search" type="search" placeholder="Buscar alumno">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Alumno</th>
+                    <th>Email</th>
+                    <th>Promocion</th>
+                    <th>Campus</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" data-panel="proyectos">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Evaluables</p>
+                <h2>Proyectos</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Proyecto</th>
+                    <th>Modulo</th>
+                    <th>Promocion</th>
+                    <th>Profesor</th>
+                  </tr>
+                </thead>
+                <tbody id="projectsTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" data-panel="notas">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Evaluacion</p>
+                <h2>Notas</h2>
+              </div>
+              <span class="hint">Score 0-100</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Alumno</th>
+                    <th>Proyecto</th>
+                    <th>Profesor</th>
+                    <th>Score</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="gradesTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" data-panel="demo">
+            <div class="demo-grid">
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Permisos</h2>
+                </div>
+                <dl class="permissions">
+                  <div>
+                    <dt>Admin</dt>
+                    <dd>CRUD completo y analiticas.</dd>
+                  </div>
+                  <div>
+                    <dt>Profesor</dt>
+                    <dd>Lee alumnos y modifica notas de sus proyectos.</dd>
+                  </div>
+                  <div>
+                    <dt>Alumno</dt>
+                    <dd>Consulta sus propias notas.</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Prueba controlada</h2>
+                </div>
+                <button id="permissionTestBtn" class="danger-outline" type="button">Intentar borrar primer alumno</button>
+                <p id="permissionResult" class="message"></p>
+              </section>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>

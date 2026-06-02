@@ -1,0 +1,5 @@
+campus_nombre,campus_ciudad,promocion_codigo,promocion_nombre,profesor_email,profesor_nombre,profesor_apellidos,especialidad,alumno_email,alumno_nombre,alumno_apellidos,proyecto_nombre,proyecto_modulo,nota_score,nota_feedback
+Madrid Centro,Madrid,FS-2026-01,FullStack Enero 2026,ana.profesor@aprentic.test,Ana,Ruiz,Backend,lucia.alumna@aprentic.test,Lucia,Molina,API REST academica,Modulo 2,86,Buen uso de capas MVC
+Madrid Centro,Madrid,FS-2026-01,FullStack Enero 2026,ana.profesor@aprentic.test,Ana,Ruiz,Backend,marco.alumno@aprentic.test,Marco,Santos,API REST academica,Modulo 2,52,Necesita reforzar validaciones
+Barcelona Tech,Barcelona,DS-2026-02,Data Science Febrero 2026,carlos.profesor@aprentic.test,Carlos,Vega,Data Science,nuria.alumna@aprentic.test,Nuria,Lopez,Dashboard academico,Modulo 3,74,Agregaciones correctas
+Barcelona Tech,Barcelona,DS-2026-02,Data Science Febrero 2026,carlos.profesor@aprentic.test,Carlos,Vega,Data Science,diego.alumno@aprentic.test,Diego,Marti,Dashboard academico,Modulo 3,48,Faltan conclusiones y limpieza
