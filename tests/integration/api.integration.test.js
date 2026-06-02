@@ -53,7 +53,8 @@ describe('AprenTIC Campus API', () => {
     const loginPage = await request(app).get('/login').expect(200).expect('Content-Type', /html/);
     expect(loginPage.text).toContain('method="post"');
     expect(loginPage.text).toContain('action="/api/auth/login"');
-    expect(loginPage.text).not.toContain('name="password"');
+    expect(loginPage.text).toContain('name="email"');
+    expect(loginPage.text).toContain('name="password"');
     await request(app).get('/health').expect(200);
 
     await registerAndGetToken('admin@aprentic.test', 'admin');
@@ -65,6 +66,16 @@ describe('AprenTIC Campus API', () => {
 
     expect(login.body.token).toEqual(expect.any(String));
     expect(login.body.user.role).toBe('admin');
+
+    const formLogin = await request(app)
+      .post('/api/auth/login')
+      .type('form')
+      .send({ email: 'admin@aprentic.test', password: 'Password123!' })
+      .expect(200)
+      .expect('Content-Type', /html/);
+
+    expect(formLogin.text).toContain('aprenticToken');
+    expect(formLogin.text).toContain("window.location.replace('/')");
   });
 
   it('permite a admin crear campus, promocion y alumno filtrable por campus', async () => {
