@@ -105,13 +105,62 @@
                     <th>Promocion</th>
                     <th>Campus</th>
                     <th>Estado</th>
-                    <th>Crear</th>
-                    <th>Editar</th>
-                    <th>Eliminar</th>
                   </tr>
                 </thead>
                 <tbody id="studentsTable"></tbody>
               </table>
+            </div>
+
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="studentSelectionLabel">Selecciona un alumno para editar o eliminar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createStudentBtn" class="button primary" type="button">Crear</button>
+                <button id="editStudentBtn" class="button" type="button" disabled>Editar</button>
+                <button id="deleteStudentBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
+            </div>
+
+            <div id="studentFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="studentFormTitle">Crear alumno</h2>
+              </div>
+              <form id="studentForm" class="student-form">
+                <div class="form-grid">
+                  <label>
+                    Nombre
+                    <input id="studentNameInput" name="nombre" type="text" placeholder="Nombre" />
+                  </label>
+                  <label>
+                    Apellidos
+                    <input id="studentLastNameInput" name="apellidos" type="text" placeholder="Apellidos" />
+                  </label>
+                  <label>
+                    Email
+                    <input id="studentEmailInput" name="email" type="email" placeholder="Email" />
+                  </label>
+                  <label>
+                    Promocion
+                    <select id="studentPromocionInput" name="promocion">
+                      <option value="">Selecciona una promocion</option>
+                    </select>
+                  </label>
+                  <label>
+                    Estado
+                    <select id="studentEstadoInput" name="estado">
+                      <option value="activo">Activo</option>
+                      <option value="riesgo">Riesgo</option>
+                      <option value="baja">Baja</option>
+                      <option value="egresado">Egresado</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button id="saveStudentBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelStudentBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
             </div>
           </section>
 

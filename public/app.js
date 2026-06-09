@@ -4,6 +4,9 @@ const state = {
   alumnos: [],
   proyectos: [],
   notas: [],
+  promociones: [],
+  selectedAlumnoId: null,
+  formMode: 'create',
   analytics: {
     campus: [],
     riesgo: [],
@@ -22,7 +25,20 @@ const elements = {
   toast: $('#toast'),
   studentSearch: $('#studentSearch'),
   permissionTestBtn: $('#permissionTestBtn'),
-  permissionResult: $('#permissionResult')
+  permissionResult: $('#permissionResult'),
+  createStudentBtn: $('#createStudentBtn'),
+  editStudentBtn: $('#editStudentBtn'),
+  deleteStudentBtn: $('#deleteStudentBtn'),
+  studentSelectionLabel: $('#studentSelectionLabel'),
+  studentActionsBar: $('.actions-bar'),
+  studentFormPanel: $('#studentFormPanel'),
+  studentForm: $('#studentForm'),
+  studentFormTitle: $('#studentFormTitle'),
+  studentNameInput: $('#studentNameInput'),
+  studentLastNameInput: $('#studentLastNameInput'),
+  studentEmailInput: $('#studentEmailInput'),
+  studentPromocionInput: $('#studentPromocionInput'),
+  studentEstadoInput: $('#studentEstadoInput'),
 };
 
 function requireSession() {
@@ -106,21 +122,24 @@ async function checkHealth() {
 
 async function loadDashboard() {
   try {
-    const [alumnos, proyectos, notas, campus, riesgo, ranking] = await Promise.all([
+    const [alumnos, proyectos, notas, campus, riesgo, ranking, promociones] = await Promise.all([
       api('/api/alumnos?limit=50&sort=apellidos').catch(emptyList),
       api('/api/proyectos?limit=50&sort=nombre').catch(emptyList),
       api('/api/notas?limit=50&sort=-updatedAt').catch(emptyList),
       api('/api/analytics/tasa-aptos-campus').catch(emptyData),
       api('/api/analytics/alumnos-riesgo?threshold=60&minNoAptos=1').catch(emptyData),
-      api('/api/analytics/ranking-proyectos-no-aptos?limit=5').catch(emptyData)
+      api('/api/analytics/ranking-proyectos-no-aptos?limit=5').catch(emptyData),
+      api('/api/promociones?limit=50&sort=codigo').catch(emptyList)
     ]);
 
     state.alumnos = alumnos.items || [];
     state.proyectos = proyectos.items || [];
     state.notas = notas.items || [];
+    state.promociones = promociones.items || [];
     state.analytics.campus = campus.data || [];
     state.analytics.riesgo = riesgo.data || [];
     state.analytics.ranking = ranking.data || [];
+    renderPromotionOptions();
 
     renderAll();
   } catch (err) {
@@ -227,13 +246,17 @@ function renderStudents() {
   $('#studentsTable').innerHTML = rows.length
     ? rows.map(studentRow).join('')
     : tableEmptyRow(5, 'No hay alumnos para mostrar');
+
+  updateStudentActions();
 }
 
 function studentRow(alumno) {
   const promocion = alumno.promocion || {};
   const campus = promocion.campus || {};
+  const selected = alumno._id === state.selectedAlumnoId ? 'selected-row' : '';
+
   return `
-    <tr>
+    <tr data-id="${escapeHtml(alumno._id)}" class="${selected}">
       <td>
         <div class="student-name">
           <strong>${escapeHtml(alumno.nombre)} ${escapeHtml(alumno.apellidos)}</strong>
@@ -246,6 +269,149 @@ function studentRow(alumno) {
       <td>${statusTag(alumno.estado || 'activo')}</td>
     </tr>
   `;
+}
+
+function updateStudentActions() {
+  const isAdmin = state.user?.role === 'admin';
+  elements.studentActionsBar.style.display = isAdmin ? 'flex' : 'none';
+
+  if (!isAdmin) {
+    elements.studentSelectionLabel.textContent = 'Solo admin puede crear, editar o eliminar alumnos.';
+    return;
+  }
+
+  const selectedAlumno = state.alumnos.find((alumno) => alumno._id === state.selectedAlumnoId);
+  const hasSelection = Boolean(selectedAlumno);
+
+  if (!hasSelection) {
+    state.selectedAlumnoId = null;
+  }
+
+  elements.editStudentBtn.disabled = !hasSelection;
+  elements.deleteStudentBtn.disabled = !hasSelection;
+  elements.studentSelectionLabel.textContent = hasSelection
+    ? `Alumno seleccionado: ${selectedAlumno.nombre} ${selectedAlumno.apellidos}`
+    : 'Selecciona un alumno para editar o eliminar';
+}
+
+function openStudentForm(id) {
+  const alumno = id ? state.alumnos.find((item) => item._id === id) : null;
+  state.formMode = id ? 'edit' : 'create';
+  state.selectedAlumnoId = id || state.selectedAlumnoId;
+
+  elements.studentFormTitle.textContent = id ? 'Editar alumno' : 'Crear alumno';
+  elements.studentNameInput.value = alumno?.nombre || '';
+  elements.studentLastNameInput.value = alumno?.apellidos || '';
+  elements.studentEmailInput.value = alumno?.email || '';
+  elements.studentPromocionInput.value = alumno?.promocion?._id || state.promociones[0]?._id || '';
+  elements.studentEstadoInput.value = alumno?.estado || 'activo';
+  elements.studentFormPanel.classList.remove('hidden');
+  elements.studentNameInput.focus();
+}
+
+function closeStudentForm() {
+  state.formMode = 'create';
+  elements.studentFormPanel.classList.add('hidden');
+  elements.studentForm.reset();
+}
+
+async function submitStudentForm(event) {
+  event.preventDefault();
+
+  const nombre = elements.studentNameInput.value.trim();
+  const apellidos = elements.studentLastNameInput.value.trim();
+  const email = elements.studentEmailInput.value.trim();
+  const promocion = elements.studentPromocionInput.value;
+  const estado = elements.studentEstadoInput.value;
+
+  if (!nombre || !apellidos || !email || !promocion) {
+    showToast('Completa nombre, apellidos, email y promocion.');
+    return;
+  }
+
+  const body = {
+    nombre,
+    apellidos,
+    email,
+    promocion,
+    estado
+  };
+
+  try {
+    if (state.formMode === 'edit') {
+      await api(`/api/alumnos/${encodeURIComponent(state.selectedAlumnoId)}`, {
+        method: 'PUT',
+        body
+      });
+      showToast('Alumno actualizado correctamente');
+    } else {
+      await api('/api/alumnos', {
+        method: 'POST',
+        body
+      });
+      showToast('Alumno creado correctamente');
+    }
+
+    closeStudentForm();
+    await loadDashboard();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+function renderPromotionOptions() {
+  const options = state.promociones.map((promocion) => {
+    const label = `${promocion.codigo}${promocion.nombre ? ` — ${promocion.nombre}` : ''}`;
+    return `<option value="${escapeHtml(promocion._id)}">${escapeHtml(label)}</option>`;
+  }).join('');
+
+  elements.studentPromocionInput.innerHTML = `
+    <option value="">Selecciona una promocion</option>
+    ${options}
+  `;
+}
+
+function createStudent() {
+  openStudentForm();
+}
+
+function editStudent() {
+  if (!state.selectedAlumnoId) {
+    showToast('Selecciona un alumno para editar');
+    return;
+  }
+
+  openStudentForm(state.selectedAlumnoId);
+}
+
+async function deleteStudent(id) {
+  if (!id) {
+    showToast('Selecciona un alumno para eliminar');
+    return;
+  }
+
+  const confirmed = confirm('¿Seguro que quieres eliminar este alumno?');
+  if (!confirmed) return;
+
+  try {
+    await api(`/api/alumnos/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    });
+    state.selectedAlumnoId = null;
+    await loadDashboard();
+    showToast('Alumno eliminado correctamente');
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+function handleStudentTableClick(event) {
+  const row = event.target.closest('tr[data-id]');
+  if (!row) return;
+
+  const id = row.dataset.id;
+  state.selectedAlumnoId = state.selectedAlumnoId === id ? null : id;
+  renderStudents();
 }
 
 function renderProjects() {
@@ -385,6 +551,12 @@ function bindEvents() {
   elements.refreshBtn.addEventListener('click', loadDashboard);
   elements.studentSearch.addEventListener('input', renderStudents);
   elements.permissionTestBtn.addEventListener('click', runPermissionTest);
+  $('#studentsTable').addEventListener('click', handleStudentTableClick);
+  elements.createStudentBtn.addEventListener('click', createStudent);
+  elements.editStudentBtn.addEventListener('click', editStudent);
+  elements.deleteStudentBtn.addEventListener('click', () => deleteStudent(state.selectedAlumnoId));
+  elements.studentForm.addEventListener('submit', submitStudentForm);
+  $('#cancelStudentBtn').addEventListener('click', closeStudentForm);
 }
 
 async function boot() {
