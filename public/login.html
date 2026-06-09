@@ -38,23 +38,8 @@
           <button id="submitBtn" class="primary" type="submit">Entrar al panel</button>
         </form>
 
-        <div class="quick-logins" aria-label="Usuarios demo">
-          <button type="button" data-login="admin">Admin</button>
-          <button type="button" data-login="profesor">Profesor</button>
-          <button type="button" data-login="alumno">Alumno</button>
-        </div>
-
         <p id="loginMessage" class="message"></p>
       </section>
-
-      <aside class="login-side">
-        <p class="eyebrow">Backend conectado</p>
-        <h2>La interfaz usa la API real del proyecto.</h2>
-        <p>
-          El login llama a <code>/api/auth/login</code> y el panel consume los endpoints protegidos con el JWT recibido.
-        </p>
-        <a class="ghost login-docs" href="/api-docs" target="_blank" rel="noreferrer">Abrir Swagger</a>
-      </aside>
     </main>
 
     <script src="/login.js"></script>
