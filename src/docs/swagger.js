@@ -1,5 +1,26 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
+// Helper para generar respuestas de error
+const errorResponse = (code, description) => ({
+  [code]: {
+    description,
+    content: {
+      'application/json': {
+        schema: { $ref: '#/components/schemas/Error' }
+      }
+    }
+  }
+});
+
+// Respuestas de error comunes reutilizables
+const commonErrors = {
+  badRequest: errorResponse('400', 'Datos invalidos'),
+  unauthorized: errorResponse('401', 'No autorizado'),
+  forbidden: errorResponse('403', 'Acceso prohibido'),
+  notFound: errorResponse('404', 'No encontrado'),
+  serverError: errorResponse('500', 'Error interno de servidor')
+};
+
 const definition = {
   openapi: '3.0.0',
   info: {
@@ -234,8 +255,7 @@ const definition = {
                   email: { type: 'string', format: 'email' },
                   password: { type: 'string', minLength: 8 },
                   role: { type: 'string', enum: ['admin', 'profesor', 'alumno'] },
-                  profesor: { type: 'string' },
-                  alumno: { type: 'string' }
+                  
                 }
               }
             }
@@ -243,8 +263,8 @@ const definition = {
         },
         responses: {
           201: { description: 'Usuario registrado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.serverError
         }
       }
     },
@@ -270,8 +290,8 @@ const definition = {
         },
         responses: {
           200: { description: 'JWT emitido', content: { 'application/json': { schema: { $ref: '#/components/schemas/AuthResponse' } } } },
-          401: { description: 'Credenciales invalidas', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...errorResponse('401', 'Credenciales invalidas'),
+          ...commonErrors.serverError
         }
       }
     },
@@ -281,8 +301,8 @@ const definition = {
         tags: ['Auth'],
         responses: {
           200: { description: 'Perfil del usuario autenticado', content: { 'application/json': { schema: { $ref: '#/components/schemas/User' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       }
     },
@@ -308,8 +328,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -336,10 +356,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Alumno creado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Alumno' } } } },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Solo admin', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -350,9 +370,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Alumno encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Alumno' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -379,11 +399,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Alumno actualizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Alumno' } } } },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Solo admin', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -392,10 +412,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Alumno eliminado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Solo admin', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       }
     },
@@ -419,10 +439,10 @@ const definition = {
         },
         responses: {
           200: { description: 'Foto subida' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Solo admin', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       }
     },
@@ -446,8 +466,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -474,10 +494,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Promocion creada' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -488,9 +508,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Promocion encontrada' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -517,11 +537,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Promocion actualizada' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -530,10 +550,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Promocion eliminada' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       }
     },
@@ -556,8 +576,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -581,10 +601,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Campus creado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -595,9 +615,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Campus encontrado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -621,11 +641,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Campus actualizado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -634,10 +654,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Campus eliminado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       }
     },
@@ -661,8 +681,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -689,10 +709,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Profesor creado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -703,9 +723,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Profesor encontrado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -732,11 +752,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Profesor actualizado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -745,10 +765,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Profesor eliminado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       }
     },
@@ -773,8 +793,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -801,10 +821,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Proyecto creado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -815,9 +835,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Proyecto encontrado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -844,11 +864,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Proyecto actualizado' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -857,10 +877,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Proyecto eliminado' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.notFound,
+          ...commonErrors.serverError
         }
       }
     },
@@ -886,8 +906,8 @@ const definition = {
               }
             }
           },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       },
       post: {
@@ -914,10 +934,10 @@ const definition = {
         },
         responses: {
           201: { description: 'Nota creada' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...commonErrors.serverError
         }
       }
     },
@@ -928,9 +948,9 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           200: { description: 'Nota encontrada' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       },
       put: {
@@ -957,11 +977,11 @@ const definition = {
         },
         responses: {
           200: { description: 'Nota actualizada' },
-          400: { description: 'Datos invalidos', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.badRequest,
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       },
       delete: {
@@ -970,10 +990,10 @@ const definition = {
         parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string' } }],
         responses: {
           204: { description: 'Nota eliminada' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       }
     },
@@ -997,10 +1017,10 @@ const definition = {
         },
         responses: {
           200: { description: 'Acta subida' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          403: { description: 'Acceso prohibido', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          404: { description: 'No encontrada', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.forbidden,
+          ...errorResponse('404', 'No encontrada'),
+          ...commonErrors.serverError
         }
       }
     },
@@ -1010,8 +1030,8 @@ const definition = {
         tags: ['Analytics'],
         responses: {
           200: { description: 'Porcentaje de aptos por campus' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       }
     },
@@ -1025,8 +1045,8 @@ const definition = {
         ],
         responses: {
           200: { description: 'Alumnos en riesgo' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       }
     },
@@ -1037,8 +1057,8 @@ const definition = {
         parameters: [{ in: 'query', name: 'limit', schema: { type: 'integer', default: 10 } }],
         responses: {
           200: { description: 'Ranking de proyectos no aptos' },
-          401: { description: 'No autorizado', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
-          500: { description: 'Error interno de servidor', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } }
+          ...commonErrors.unauthorized,
+          ...commonErrors.serverError
         }
       }
     }
