@@ -5,8 +5,13 @@ const state = {
   proyectos: [],
   notas: [],
   promociones: [],
+<<<<<<< HEAD
+  selectedStudent: null,
+  studentFormMode: 'create',
+=======
   selectedAlumnoId: null,
   formMode: 'create',
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
   analytics: {
     campus: [],
     riesgo: [],
@@ -26,6 +31,24 @@ const elements = {
   studentSearch: $('#studentSearch'),
   permissionTestBtn: $('#permissionTestBtn'),
   permissionResult: $('#permissionResult'),
+<<<<<<< HEAD
+  actionsRow: $('#actionsRow'),
+  btnEditStudent: $('#btnEditStudent'),
+  btnCreateStudent: $('#btnCreateStudent'),
+  btnDeleteStudent: $('#btnDeleteStudent'),
+  studentFormContainer: $('#studentFormContainer'),
+  studentForm: $('#studentForm'),
+  studentFormTitle: $('#studentFormTitle'),
+  studentFormSubmit: $('#studentFormSubmit'),
+  studentFormCancel: $('#studentFormCancel'),
+  studentFormError: $('#studentFormError'),
+  studentNombre: $('#studentNombre'),
+  studentApellidos: $('#studentApellidos'),
+  studentEmail: $('#studentEmail'),
+  studentPromocion: $('#studentPromocion'),
+  studentEstado: $('#studentEstado'),
+  studentsTable: $('#studentsTable')
+=======
   createStudentBtn: $('#createStudentBtn'),
   editStudentBtn: $('#editStudentBtn'),
   deleteStudentBtn: $('#deleteStudentBtn'),
@@ -39,6 +62,7 @@ const elements = {
   studentEmailInput: $('#studentEmailInput'),
   studentPromocionInput: $('#studentPromocionInput'),
   studentEstadoInput: $('#studentEstadoInput'),
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
 };
 
 function requireSession() {
@@ -103,6 +127,7 @@ async function api(path, options = {}) {
     const error = new Error(payload?.message || `HTTP ${response.status}`);
     error.status = response.status;
     error.payload = payload;
+    error.details = payload?.details || null;
     throw error;
   }
 
@@ -122,10 +147,15 @@ async function checkHealth() {
 
 async function loadDashboard() {
   try {
+<<<<<<< HEAD
+    const [alumnos, proyectos, notas, promociones, campus, riesgo, ranking] = await Promise.all([
+=======
     const [alumnos, proyectos, notas, campus, riesgo, ranking, promociones] = await Promise.all([
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
       api('/api/alumnos?limit=50&sort=apellidos').catch(emptyList),
       api('/api/proyectos?limit=50&sort=nombre').catch(emptyList),
       api('/api/notas?limit=50&sort=-updatedAt').catch(emptyList),
+      api('/api/promociones?limit=50&sort=codigo').catch(emptyList),
       api('/api/analytics/tasa-aptos-campus').catch(emptyData),
       api('/api/analytics/alumnos-riesgo?threshold=60&minNoAptos=1').catch(emptyData),
       api('/api/analytics/ranking-proyectos-no-aptos?limit=5').catch(emptyData),
@@ -136,6 +166,10 @@ async function loadDashboard() {
     state.proyectos = proyectos.items || [];
     state.notas = notas.items || [];
     state.promociones = promociones.items || [];
+<<<<<<< HEAD
+    updatePromocionOptions();
+=======
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
     state.analytics.campus = campus.data || [];
     state.analytics.riesgo = riesgo.data || [];
     state.analytics.ranking = ranking.data || [];
@@ -243,20 +277,38 @@ function renderStudents() {
     return text.includes(query);
   });
 
-  $('#studentsTable').innerHTML = rows.length
+  elements.studentsTable.innerHTML = rows.length
     ? rows.map(studentRow).join('')
     : tableEmptyRow(5, 'No hay alumnos para mostrar');
 
+<<<<<<< HEAD
+  // Agregar event listeners a las filas
+  $$('.student-row').forEach((row) => {
+    row.addEventListener('click', () => {
+      const studentId = row.dataset.studentId;
+      state.selectedStudent = state.alumnos.find((a) => a._id === studentId) || null;
+      renderStudents(); // Re-render para mostrar selección
+      updateActionsVisibility();
+    });
+  });
+=======
   updateStudentActions();
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
 }
 
 function studentRow(alumno) {
   const promocion = alumno.promocion || {};
   const campus = promocion.campus || {};
+<<<<<<< HEAD
+  const isSelected = state.selectedStudent?._id === alumno._id ? 'selected' : '';
+  return `
+    <tr class="student-row ${isSelected}" data-student-id="${alumno._id}">
+=======
   const selected = alumno._id === state.selectedAlumnoId ? 'selected-row' : '';
 
   return `
     <tr data-id="${escapeHtml(alumno._id)}" class="${selected}">
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
       <td>
         <div class="student-name">
           <strong>${escapeHtml(alumno.nombre)} ${escapeHtml(alumno.apellidos)}</strong>
@@ -513,6 +565,170 @@ async function runPermissionTest() {
   }
 }
 
+function updateActionsVisibility() {
+  const isAdmin = state.user?.role === 'admin';
+  const hasSelection = !!state.selectedStudent;
+
+  if (isAdmin) {
+    elements.actionsRow.classList.remove('hidden');
+  } else {
+    elements.actionsRow.classList.add('hidden');
+    hideStudentForm();
+  }
+
+  elements.btnEditStudent.disabled = !hasSelection;
+  elements.btnDeleteStudent.disabled = !hasSelection;
+}
+
+function updatePromocionOptions() {
+  if (!elements.studentPromocion) return;
+
+  const options = [
+    '<option value="">Selecciona promocion</option>',
+    ...state.promociones.map((promocion) => `
+      <option value="${escapeHtml(promocion._id)}">${escapeHtml(promocion.codigo || promocion.nombre || promocion._id)}</option>`)
+  ];
+
+  elements.studentPromocion.innerHTML = options.join('');
+}
+
+function showStudentForm(mode = 'create') {
+  state.studentFormMode = mode;
+  elements.studentFormTitle.textContent = mode === 'edit' ? 'Editar alumno' : 'Crear alumno';
+  elements.studentFormSubmit.textContent = mode === 'edit' ? 'Actualizar alumno' : 'Crear alumno';
+  elements.studentFormContainer.classList.remove('hidden');
+  displayStudentFormError('');
+  updatePromocionOptions();
+
+  if (mode === 'edit' && state.selectedStudent) {
+    elements.studentNombre.value = state.selectedStudent.nombre || '';
+    elements.studentApellidos.value = state.selectedStudent.apellidos || '';
+    elements.studentEmail.value = state.selectedStudent.email || '';
+    elements.studentPromocion.value = state.selectedStudent.promocion?._id || state.selectedStudent.promocion || '';
+    elements.studentEstado.value = state.selectedStudent.estado || 'activo';
+  } else {
+    elements.studentForm.reset();
+    elements.studentEstado.value = 'activo';
+  }
+}
+
+function hideStudentForm() {
+  elements.studentFormContainer.classList.add('hidden');
+  elements.studentForm.reset();
+  displayStudentFormError('');
+  state.studentFormMode = 'create';
+}
+
+function displayStudentFormError(message = '') {
+  elements.studentFormError.textContent = message;
+}
+
+function normalizeInput(value) {
+  return String(value || '').trim();
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+async function createAlumno() {
+  if (!state.promociones.length) {
+    showToast('No hay promociones disponibles para crear alumno.');
+    return;
+  }
+
+  showStudentForm('create');
+}
+
+async function editAlumno() {
+  if (!state.selectedStudent) {
+    showToast('Por favor selecciona un alumno');
+    return;
+  }
+
+  showStudentForm('edit');
+}
+
+async function submitStudentForm(event) {
+  event.preventDefault();
+
+  const nombre = normalizeInput(elements.studentNombre.value);
+  const apellidos = normalizeInput(elements.studentApellidos.value);
+  const email = normalizeInput(elements.studentEmail.value);
+  const promocion = elements.studentPromocion.value;
+  const estado = elements.studentEstado.value;
+
+  if (!nombre) {
+    displayStudentFormError('Nombre es obligatorio.');
+    return;
+  }
+
+  if (!apellidos) {
+    displayStudentFormError('Apellidos son obligatorios.');
+    return;
+  }
+
+  if (!email || !isValidEmail(email)) {
+    displayStudentFormError('Email invalido.');
+    return;
+  }
+
+  if (!promocion) {
+    displayStudentFormError('Promoción es obligatoria.');
+    return;
+  }
+
+  const payload = { nombre, apellidos, email, promocion, estado };
+
+  try {
+    if (state.studentFormMode === 'edit') {
+      if (!state.selectedStudent) {
+        displayStudentFormError('No hay alumno seleccionado para editar.');
+        return;
+      }
+      await api(`/api/alumnos/${state.selectedStudent._id}`, {
+        method: 'PUT',
+        body: payload
+      });
+      showToast('Alumno actualizado exitosamente');
+    } else {
+      await api('/api/alumnos', {
+        method: 'POST',
+        body: payload
+      });
+      showToast('Alumno creado exitosamente');
+    }
+
+    hideStudentForm();
+    state.selectedStudent = null;
+    await loadDashboard();
+  } catch (err) {
+    const details = err.payload?.details?.map((item) => `${item.field}: ${item.message}`).join('; ');
+    displayStudentFormError(details || err.message || 'Error al guardar alumno');
+  }
+}
+
+async function deleteAlumno() {
+  if (!state.selectedStudent) {
+    showToast('Por favor selecciona un alumno');
+    return;
+  }
+
+  const confirm = window.confirm(`¿Estás seguro de que quieres eliminar a ${state.selectedStudent.nombre} ${state.selectedStudent.apellidos}?`);
+  if (!confirm) return;
+
+  try {
+    await api(`/api/alumnos/${state.selectedStudent._id}`, {
+      method: 'DELETE'
+    });
+    state.selectedStudent = null;
+    await loadDashboard();
+    showToast('Alumno eliminado exitosamente');
+  } catch (err) {
+    showToast(`Error al eliminar alumno: ${err.message}`);
+  }
+}
+
 function statusTag(value) {
   const clean = String(value);
   const className = clean === 'apto' || clean === 'activo' ? 'ok' : clean === 'riesgo' || clean === 'no apto' ? 'error' : '';
@@ -551,12 +767,22 @@ function bindEvents() {
   elements.refreshBtn.addEventListener('click', loadDashboard);
   elements.studentSearch.addEventListener('input', renderStudents);
   elements.permissionTestBtn.addEventListener('click', runPermissionTest);
+<<<<<<< HEAD
+  elements.btnEditStudent.addEventListener('click', editAlumno);
+  elements.btnCreateStudent.addEventListener('click', createAlumno);
+  elements.btnDeleteStudent.addEventListener('click', deleteAlumno);
+  elements.studentForm.addEventListener('submit', submitStudentForm);
+  elements.studentFormCancel.addEventListener('click', hideStudentForm);
+
+  updateActionsVisibility();
+=======
   $('#studentsTable').addEventListener('click', handleStudentTableClick);
   elements.createStudentBtn.addEventListener('click', createStudent);
   elements.editStudentBtn.addEventListener('click', editStudent);
   elements.deleteStudentBtn.addEventListener('click', () => deleteStudent(state.selectedAlumnoId));
   elements.studentForm.addEventListener('submit', submitStudentForm);
   $('#cancelStudentBtn').addEventListener('click', closeStudentForm);
+>>>>>>> d753a4f9a03c7e5af622ca411e3ce34c98dc8fe5
 }
 
 async function boot() {
