@@ -30,8 +30,7 @@ const definition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000',
-      description: 'Local'
+      url: '/'
     }
   ],
   components: {
@@ -256,8 +255,7 @@ const definition = {
                   email: { type: 'string', format: 'email' },
                   password: { type: 'string', minLength: 8 },
                   role: { type: 'string', enum: ['admin', 'profesor', 'alumno'] },
-                  profesor: { type: 'string' },
-                  alumno: { type: 'string' }
+                  
                 }
               }
             }
