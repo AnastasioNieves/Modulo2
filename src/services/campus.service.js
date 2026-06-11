@@ -1,14 +1,12 @@
 const Campus = require('../models/Campus');
 const createCrudService = require('./crudFactory');
 
-const campusOptions = {
+module.exports = createCrudService(Campus, {
   searchFields: ['nombre', 'ciudad'],
-  sortFields: ['createdAt', 'updatedAt', 'nombre'],
+  sortFields: ['createdAt', 'updatedAt', 'nombre', 'ciudad'],
   buildFilter: async (query) => {
     const filter = {};
-    if (query.ciudad) filter.ciudad = query.ciudad;
+    if (query.ciudad) filter.ciudad = new RegExp(String(query.ciudad), 'i');
     return filter;
   }
-};
-
-module.exports = Object.assign(createCrudService(Campus, campusOptions), { __options: campusOptions });
+});

@@ -1,7 +1,7 @@
 const Promocion = require('../models/Promocion');
 const createCrudService = require('./crudFactory');
 
-const promocionesOptions = {
+module.exports = createCrudService(Promocion, {
   populate: [{ path: 'campus', select: 'nombre ciudad' }],
   searchFields: ['nombre', 'codigo'],
   sortFields: ['createdAt', 'updatedAt', 'nombre', 'codigo', 'fechaInicio'],
@@ -11,6 +11,4 @@ const promocionesOptions = {
     if (query.modalidad) filter.modalidad = query.modalidad;
     return filter;
   }
-};
-
-module.exports = Object.assign(createCrudService(Promocion, promocionesOptions), { __options: promocionesOptions });
+});

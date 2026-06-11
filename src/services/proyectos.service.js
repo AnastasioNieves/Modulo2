@@ -1,7 +1,7 @@
 const Proyecto = require('../models/Proyecto');
 const createCrudService = require('./crudFactory');
 
-const proyectosOptions = {
+module.exports = createCrudService(Proyecto, {
   populate: [
     { path: 'profesor', select: 'nombre apellidos email' },
     {
@@ -19,6 +19,4 @@ const proyectosOptions = {
     if (query.modulo) filter.modulo = new RegExp(String(query.modulo), 'i');
     return filter;
   }
-};
-
-module.exports = Object.assign(createCrudService(Proyecto, proyectosOptions), { __options: proyectosOptions });
+});

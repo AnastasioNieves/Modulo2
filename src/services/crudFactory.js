@@ -8,7 +8,7 @@ function applyPopulate(query, populate = []) {
   return query;
 }
 
-function createCrudServiceImpl(Model, options = {}) {
+function createCrudService(Model, options = {}) {
   const {
     populate = [],
     searchFields = [],
@@ -99,20 +99,5 @@ function createCrudServiceImpl(Model, options = {}) {
     softDelete
   };
 }
-
-function createCrudService(...args) {
-  // record call for tests expecting a mock
-  if (!createCrudService.mock) {
-    createCrudService.mock = { calls: [] };
-  }
-  createCrudService.mock.calls.push(args);
-  return createCrudServiceImpl(...args);
-}
-
-createCrudService.mockClear = function () {
-  if (createCrudService.mock) createCrudService.mock.calls.length = 0;
-};
-
-createCrudService._isMockFunction = true;
 
 module.exports = createCrudService;
