@@ -1,7 +1,7 @@
 const Profesor = require('../models/Profesor');
 const createCrudService = require('./crudFactory');
 
-module.exports = createCrudService(Profesor, {
+const profesoresOptions = {
   populate: [
     { path: 'campus', select: 'nombre ciudad' },
     { path: 'promociones', select: 'nombre codigo' }
@@ -14,4 +14,6 @@ module.exports = createCrudService(Profesor, {
     if (query.promocion) filter.promociones = query.promocion;
     return filter;
   }
-});
+};
+
+module.exports = Object.assign(createCrudService(Profesor, profesoresOptions), { __options: profesoresOptions });
