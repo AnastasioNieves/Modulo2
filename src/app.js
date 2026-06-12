@@ -18,6 +18,7 @@ const profesoresRoutes = require('./routes/profesores.routes');
 const proyectosRoutes = require('./routes/proyectos.routes');
 const notasRoutes = require('./routes/notas.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
+const usersRoutes = require('./routes/users.routes');
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.get('/login', (req, res) => {
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/campus', campusRoutes);
 app.use('/api/alumnos', alumnosRoutes);
 app.use('/api/promociones', promocionesRoutes);
