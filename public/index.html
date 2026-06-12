@@ -20,6 +20,9 @@
         <nav class="nav">
           <button class="nav-item active" data-section="dashboard" type="button">Dashboard</button>
           <button class="nav-item" data-section="alumnos" type="button">Alumnos</button>
+          <button class="nav-item" data-section="campus" type="button">Campus</button>
+          <button class="nav-item" data-section="promociones" type="button">Promociones</button>
+          <button class="nav-item" data-section="profesores" type="button">Profesores</button>
           <button class="nav-item" data-section="proyectos" type="button">Proyectos</button>
           <button class="nav-item" data-section="notas" type="button">Notas</button>
           <button class="nav-item" data-section="demo" type="button">Demo roles</button>
@@ -164,12 +167,169 @@
             </div>
           </section>
 
+          <section class="section" data-panel="campus">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Sedes</p>
+                <h2>Campus</h2>
+              </div>
+              <input id="campusSearch" class="search" type="search" placeholder="Buscar campus">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Ciudad</th>
+                    <th>Direccion</th>
+                  </tr>
+                </thead>
+                <tbody id="campusTable"></tbody>
+              </table>
+            </div>
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="campusSelectionLabel">Selecciona un campus para editar o eliminar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createCampusBtn" class="button primary" type="button">Crear</button>
+                <button id="editCampusBtn" class="button" type="button" disabled>Editar</button>
+                <button id="deleteCampusBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
+            </div>
+            <div id="campusFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="campusFormTitle">Crear campus</h2>
+              </div>
+              <form id="campusForm" class="student-form">
+                <div class="form-grid">
+                  <label>Nombre<input id="campusNameInput" name="nombre" type="text" placeholder="Nombre" /></label>
+                  <label>Ciudad<input id="campusCityInput" name="ciudad" type="text" placeholder="Ciudad" /></label>
+                  <label>Direccion<input id="campusAddressInput" name="direccion" type="text" placeholder="Direccion" /></label>
+                </div>
+                <div class="form-actions">
+                  <button id="saveCampusBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelCampusBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="section" data-panel="promociones">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Bootcamps</p>
+                <h2>Promociones</h2>
+              </div>
+              <input id="promocionSearch" class="search" type="search" placeholder="Buscar promocion">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Codigo</th>
+                    <th>Nombre</th>
+                    <th>Campus</th>
+                    <th>Modalidad</th>
+                  </tr>
+                </thead>
+                <tbody id="promocionesTable"></tbody>
+              </table>
+            </div>
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="promocionSelectionLabel">Selecciona una promocion para editar o eliminar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createPromocionBtn" class="button primary" type="button">Crear</button>
+                <button id="editPromocionBtn" class="button" type="button" disabled>Editar</button>
+                <button id="deletePromocionBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
+            </div>
+            <div id="promocionFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="promocionFormTitle">Crear promocion</h2>
+              </div>
+              <form id="promocionForm" class="student-form">
+                <div class="form-grid">
+                  <label>Nombre<input id="promocionNameInput" name="nombre" type="text" placeholder="Nombre" /></label>
+                  <label>Codigo<input id="promocionCodeInput" name="codigo" type="text" placeholder="Codigo" /></label>
+                  <label>Campus<select id="promocionCampusInput" name="campus"></select></label>
+                  <label>Modalidad<select id="promocionModalidadInput" name="modalidad">
+                      <option value="presencial">Presencial</option>
+                      <option value="online">Online</option>
+                      <option value="hibrida">Hibrida</option>
+                    </select></label>
+                  <label>Fecha inicio<input id="promocionInicioInput" name="fechaInicio" type="date" /></label>
+                  <label>Fecha fin<input id="promocionFinInput" name="fechaFin" type="date" /></label>
+                </div>
+                <div class="form-actions">
+                  <button id="savePromocionBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelPromocionBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="section" data-panel="profesores">
+            <div class="table-header">
+              <div>
+                <p class="eyebrow">Docentes</p>
+                <h2>Profesores</h2>
+              </div>
+              <input id="profesorSearch" class="search" type="search" placeholder="Buscar profesor">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Profesor</th>
+                    <th>Email</th>
+                    <th>Campus</th>
+                    <th>Especialidad</th>
+                  </tr>
+                </thead>
+                <tbody id="profesoresTable"></tbody>
+              </table>
+            </div>
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="profesorSelectionLabel">Selecciona un profesor para editar o eliminar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createProfesorBtn" class="button primary" type="button">Crear</button>
+                <button id="editProfesorBtn" class="button" type="button" disabled>Editar</button>
+                <button id="deleteProfesorBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
+            </div>
+            <div id="profesorFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="profesorFormTitle">Crear profesor</h2>
+              </div>
+              <form id="profesorForm" class="student-form">
+                <div class="form-grid">
+                  <label>Nombre<input id="profesorNameInput" name="nombre" type="text" placeholder="Nombre" /></label>
+                  <label>Apellidos<input id="profesorLastNameInput" name="apellidos" type="text" placeholder="Apellidos" /></label>
+                  <label>Email<input id="profesorEmailInput" name="email" type="email" placeholder="Email" /></label>
+                  <label>Especialidad<input id="profesorEspecialidadInput" name="especialidad" type="text" placeholder="Especialidad" /></label>
+                  <label>Campus<select id="profesorCampusInput" name="campus"></select></label>
+                  <label>Promociones<select id="profesorPromocionesInput" name="promociones" multiple size="4"></select></label>
+                </div>
+                <div class="form-actions">
+                  <button id="saveProfesorBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelProfesorBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
           <section class="section" data-panel="proyectos">
             <div class="table-header">
               <div>
                 <p class="eyebrow">Evaluables</p>
                 <h2>Proyectos</h2>
               </div>
+              <input id="projectSearch" class="search" type="search" placeholder="Buscar proyecto">
             </div>
             <div class="table-wrap">
               <table>
@@ -184,6 +344,35 @@
                 <tbody id="projectsTable"></tbody>
               </table>
             </div>
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="projectSelectionLabel">Selecciona un proyecto para editar o eliminar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createProjectBtn" class="button primary" type="button">Crear</button>
+                <button id="editProjectBtn" class="button" type="button" disabled>Editar</button>
+                <button id="deleteProjectBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
+            </div>
+            <div id="projectFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="projectFormTitle">Crear proyecto</h2>
+              </div>
+              <form id="projectForm" class="student-form">
+                <div class="form-grid">
+                  <label>Nombre<input id="projectNameInput" name="nombre" type="text" placeholder="Nombre" /></label>
+                  <label>Modulo<input id="projectModuloInput" name="modulo" type="text" placeholder="Modulo" /></label>
+                  <label>Promocion<select id="projectPromocionInput" name="promocion"></select></label>
+                  <label>Profesor<select id="projectProfesorInput" name="profesor"></select></label>
+                  <label>Descripcion<input id="projectDescriptionInput" name="descripcion" type="text" placeholder="Descripcion" /></label>
+                  <label>Fecha entrega<input id="projectFechaEntregaInput" name="fechaEntrega" type="date" /></label>
+                </div>
+                <div class="form-actions">
+                  <button id="saveProjectBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelProjectBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
+            </div>
           </section>
 
           <section class="section" data-panel="notas">
@@ -193,6 +382,15 @@
                 <h2>Notas</h2>
               </div>
               <span class="hint">Score 0-100</span>
+            </div>
+            <div class="actions-bar">
+              <div class="actions-summary">
+                <span id="noteSelectionLabel">Selecciona una nota para eliminar o editar</span>
+              </div>
+              <div class="action-buttons">
+                <button id="createNoteBtn" class="button primary" type="button">Crear</button>
+                <button id="deleteNoteBtn" class="button danger-outline" type="button" disabled>Eliminar</button>
+              </div>
             </div>
             <div class="table-wrap">
               <table>
@@ -208,6 +406,24 @@
                 </thead>
                 <tbody id="gradesTable"></tbody>
               </table>
+            </div>
+            <div id="noteFormPanel" class="panel form-panel hidden">
+              <div class="panel-heading">
+                <h2 id="noteFormTitle">Crear nota</h2>
+              </div>
+              <form id="noteForm" class="student-form">
+                <div class="form-grid">
+                  <label>Alumno<select id="noteAlumnoInput" name="alumno"></select></label>
+                  <label>Proyecto<select id="noteProyectoInput" name="proyecto"></select></label>
+                  <label>Profesor<select id="noteProfesorInput" name="profesor"></select></label>
+                  <label>Score<input id="noteScoreInput" name="score" type="number" min="0" max="100" /></label>
+                  <label>Feedback<input id="noteFeedbackInput" name="feedback" type="text" placeholder="Feedback" /></label>
+                </div>
+                <div class="form-actions">
+                  <button id="saveNoteBtn" class="button primary" type="submit">Guardar</button>
+                  <button id="cancelNoteBtn" class="button ghost" type="button">Cancelar</button>
+                </div>
+              </form>
             </div>
           </section>
 
