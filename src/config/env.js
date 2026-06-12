@@ -14,13 +14,7 @@ if (process.env.NODE_ENV === 'production') {
 const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS || 10);
 
 function normalizeMongoUri(rawUri) {
-  const directHosts = (process.env.MONGODB_DIRECT_HOSTS || '')
-    .split(',')
-    .map((host) => host.trim())
-    .filter(Boolean)
-    .join(',');
-
-  if (!rawUri || !rawUri.startsWith('mongodb+srv://') || !directHosts) {
+  if (!rawUri || !rawUri.startsWith('mongodb+srv://')) {
     return rawUri;
   }
 
@@ -51,6 +45,20 @@ function normalizeMongoUri(rawUri) {
     parsedUri.pathname && parsedUri.pathname !== '/'
       ? parsedUri.pathname
       : `/${process.env.MONGODB_DATABASE || 'aprentic-campus'}`;
+
+  parsedUri.pathname = database;
+  parsedUri.search = params.toString();
+
+  const directHosts = (process.env.MONGODB_DIRECT_HOSTS || '')
+    .split(',')
+    .map((host) => host.trim())
+    .filter(Boolean)
+    .join(',');
+
+  if (!directHosts) {
+    return parsedUri.toString();
+  }
+
   const credentials = parsedUri.username
     ? `${parsedUri.username}${parsedUri.password ? `:${parsedUri.password}` : ''}@`
     : '';

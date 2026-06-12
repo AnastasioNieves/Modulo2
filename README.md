@@ -1,138 +1,177 @@
 # AprenTIC Campus API
 
-API REST profesional para gestion academica multi-campus, construida con Node.js, Express, MongoDB Atlas y Mongoose. La base esta alineada con el PDF del proyecto integrador: MVC, JWT, roles, validacion, subida de archivos, agregaciones, Swagger, tests y seed desde CSV.
+API REST para la gestión académica multi-campus. Esta aplicación ofrece un backend completo con autenticación por roles, operaciones CRUD sobre las entidades del dominio, carga de ficheros, y varios endpoints de analítica para reporting.
 
-## Stack
+Principales características:
+- Implementación RESTful con Node.js y Express.
+- Persistencia con MongoDB (Atlas o conexión local) y Mongoose.
+- Autenticación y autorización basada en JWT y roles (`admin`, `profesor`, `alumno`).
+- Subida de ficheros con `multer` (fotos, actas, etc.).
+- Documentación automática con Swagger UI disponible en `/api-docs`.
+- Suites de tests con Jest y Supertest; entornos de prueba aislados mediante `mongodb-memory-server`.
 
-- Node.js + Express
-- MongoDB Atlas + Mongoose
-- JWT + bcryptjs (algoritmo bcrypt)
-- express-validator
-- Multer para fotos de alumnos y actas PDF
-- Swagger UI en `/api-docs`
-- Jest + supertest + mongodb-memory-server
+## Contenido del repositorio
 
-## Modelo MongoDB Atlas recomendado
+- `src/` — código fuente del servidor (rutas, controladores, modelos, servicios, middlewares).
+- `public/` — frontend de demostración (panel de administración y login).
+- `scripts/` — utilidades de desarrollo: `seed.js` (poblar datos), `demo-server.js` (servidor con Mongo en memoria).
+- `data/` — recursos de datos, p. ej. CSV para seeding.
+- `diagrams/` — diagramas del modelo de datos.
 
-El proyecto usa MongoDB Atlas, una BBDD NoSQL documental. El modelo usa colecciones de documentos con referencias `ObjectId` porque el dominio tiene entidades que se consultan y modifican por separado:
+## Tecnologías
 
-- `Campus`: documentos de sedes fisicas/logicas.
-- `Promocion`: documentos de cohortes, con `campus: ObjectId`.
-- `Profesor`: documentos de docentes, con `campus: ObjectId` y `promociones: ObjectId[]`.
-- `Alumno`: documentos de estudiantes, con `promocion: ObjectId`.
-- `Proyecto`: documentos evaluables, con `promocion: ObjectId` y `profesor: ObjectId`.
-- `Nota`: documentos de evaluacion con referencias a alumno, proyecto y profesor.
-- `User`: documentos de autenticacion y rol (`admin`, `profesor`, `alumno`).
+- Node.js, Express
+- MongoDB, Mongoose
+- JSON Web Tokens (JWT)
+- `bcryptjs` para hashing de contraseñas
+- `express-validator` para validación de entrada
+- `multer` para gestión de ficheros
+- Swagger (swagger-jsdoc + swagger-ui-express)
+- Jest, Supertest y `mongodb-memory-server` para pruebas
 
-La relacion `Nota` tiene indice unico `{ alumno, proyecto }`, para evitar dos notas del mismo alumno en el mismo proyecto.
+## Requisitos previos
 
-Diagramas de entrega:
+- Node.js >= 18
+- Acceso a MongoDB (Atlas o instancia local)
 
-- `diagrams/er-model.svg`: diagrama conceptual/documental MongoDB dibujado en SVG.
-- `diagrams/logical-model.svg`: modelo logico MongoDB Atlas dibujado en SVG.
+## Instalación y puesta en marcha
 
-## Instalacion
+1. Instalar dependencias:
 
 ```bash
 npm install
+```
+
+2. Crear el fichero de entorno a partir del ejemplo:
+
+```bash
 cp .env.example .env
+```
+
+3. Ajustar las variables de entorno en `.env` (ver sección siguiente).
+
+4. Poblar la base de datos (opcional, para demo):
+
+```bash
 npm run seed
+```
+
+5. Arrancar la aplicación en desarrollo:
+
+```bash
 npm run dev
 ```
 
-En Windows PowerShell, copia `.env.example` a `.env` manualmente o con:
+En Windows PowerShell use `Copy-Item .env.example .env` si `cp` no está disponible.
 
-```powershell
-Copy-Item .env.example .env
+Para ejecutar la demo con una base en memoria (no toca su Atlas ni Mongo local):
+
+```bash
+npm run demo
 ```
 
-Para una demo local sin Atlas ni Mongo instalado:
-
-```powershell
-npm.cmd run demo
-```
-
-Abre `http://localhost:3000` y usa los botones de login rapido.
+El comando `demo` arranca un servidor con `mongodb-memory-server` y siembra datos de ejemplo; útil para pruebas rápidas y presentaciones locales.
 
 ## Variables de entorno
 
+Algunas variables de entorno relevantes (consulte `.env.example` para la lista completa):
+
 ```env
 PORT=3000
-MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/aprentic-campus
-JWT_SECRET=cambia-este-secreto-en-produccion
+MONGODB_URI=mongodb+srv://<usuario>:<password>@cluster.mongodb.net/aprentic-campus
+MONGODB_DATABASE=aprentic-campus
+JWT_SECRET=replace-me-in-production
 JWT_EXPIRES_IN=1h
 BCRYPT_SALT_ROUNDS=10
 CORS_ORIGIN=http://localhost:3000
 UPLOAD_DIR=uploads
 ```
 
-## Usuarios demo del seed
+Notas:
+- `MONGODB_URI` puede apuntar a un clúster Atlas o a una instancia local. Si la cadena SRV falla en su entorno, la aplicación soporta una variante directa mediante `MONGODB_DIRECT_HOSTS`.
+- `MONGODB_DATABASE` fuerza el nombre de base usado por Mongoose; por defecto es `aprentic-campus`.
+
+## Usuarios de ejemplo (seed)
+
+Tras ejecutar `npm run seed` se crean usuarios de prueba:
 
 - Admin: `admin@aprentic.test` / `Admin1234!`
 - Profesor: `ana.profesor@aprentic.test` / `Profesor1234!`
 - Alumno: `lucia.alumna@aprentic.test` / `Alumno1234!`
 
-## Endpoints principales
+## Endpoints destacados
 
-- `GET /` panel web de demo
-- `GET /login` pantalla de login del frontend
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/alumnos?campus=&promocion=&page=&sort=`
-- `POST /api/alumnos/:id/photo`
-- `GET /api/promociones`
-- `GET /api/profesores`
-- `GET /api/proyectos`
-- `GET /api/notas`
-- `POST /api/notas`
-- `POST /api/notas/:id/acta`
-- `GET /api/analytics/tasa-aptos-campus`
-- `GET /api/analytics/alumnos-riesgo`
-- `GET /api/analytics/ranking-proyectos-no-aptos`
+La API expone múltiples recursos; los principales son:
 
-## Roles
+- Frontend y autenticación
+	- `GET /` — panel de demo (frontend)
+	- `GET /login` — página de inicio de sesión
+	- `POST /api/auth/register`
+	- `POST /api/auth/login`
 
-- `admin`: acceso total a CRUD, usuarios, notas y analiticas.
-- `profesor`: lee alumnos, promociones, proyectos y solo crea/modifica notas de sus proyectos.
-- `alumno`: extra preparado; puede consultar sus propias notas.
+- Alumnos
+	- `GET /api/alumnos` — listado y filtros
+	- `POST /api/alumnos` — crear alumno
+	- `PUT /api/alumnos/:id` — actualizar alumno
+	- `POST /api/alumnos/:id/photo` — subir foto
 
-Por seguridad, el registro publico solo permite crear el primer `admin` de bootstrap. En una demo normal usa el seed y entra con `admin@aprentic.test`.
+- Promociones, Profesores, Proyectos, Notas
+	- Rutas CRUD en `/api/promociones`, `/api/profesores`, `/api/proyectos`, `/api/notas`
+	- `POST /api/notas/:id/acta` — subir acta/justificante
 
-## Tests
+- Analíticas
+	- `GET /api/analytics/tasa-aptos-campus`
+	- `GET /api/analytics/alumnos-riesgo`
+	- `GET /api/analytics/ranking-proyectos-no-aptos`
+
+Consulte la documentación Swagger en `/api-docs` para la especificación completa y ejemplos de uso.
+
+## Autenticación y roles
+
+- `admin`: permisos totales sobre recursos y analíticas.
+- `profesor`: puede gestionar notas de sus proyectos y consultar listas de alumnos/proyectos.
+- `alumno`: acceso restringido a sus propios datos.
+
+El middleware de autorización está implementado en `src/middlewares/requireRole.js` y `src/middlewares/authRequired.js`.
+
+## Pruebas
+
+Ejecutar la suite de tests:
 
 ```bash
 npm test
 ```
 
-Incluye tests unitarios de utilidades y tests de integracion con API real sobre MongoDB en memoria.
+Los tests de integración utilizan `mongodb-memory-server` para mantener el aislamiento respecto a entornos reales.
 
-## Frontend de demo
+## Despliegue (ejemplo en Render / plataformas similares)
 
-La API sirve un frontend sencillo conectado al propio backend del proyecto:
+1. Provisionar un clúster MongoDB en Atlas (M0 está bien para pruebas).
+2. Añadir variables de entorno en la plataforma (`MONGODB_URI`, `JWT_SECRET`, `NODE_ENV=production`, etc.).
+3. Configurar build y start:
 
-- `/login`: pantalla propia de autenticacion que llama a `/api/auth/login`.
-- `/`: panel protegido que usa el JWT guardado tras el login.
-- Visualizar alumnos, proyectos y notas.
-- Ver agregaciones: aptos por campus, alumnos en riesgo y ranking de no aptos.
-- Actualizar notas desde el listado.
-- Probar permisos con un intento controlado de borrado de alumno.
+```text
+Build command: npm install
+Start command: npm start
+```
 
-## Deploy en Render
+4. Ejecutar el script de seed contra la base de Atlas si desea datos iniciales: `npm run seed`.
 
-1. Crea MongoDB Atlas M0 y copia el connection string.
-2. Crea Web Service en Render conectado al repo GitHub.
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Variables: `MONGODB_URI`, `JWT_SECRET`, `NODE_ENV=production`, `BCRYPT_SALT_ROUNDS=10`.
-6. Ejecuta el seed localmente contra Atlas o desde un job temporal de Render: `npm run seed`.
+## Buenas prácticas y advertencias
 
-## Presentacion sugerida
+- No ejecute `npm run demo` en entornos de producción: crea una base en memoria aislada (`test` por defecto) pensada únicamente para demos.
+- Mantenga `JWT_SECRET` seguro y distinto entre entornos.
+- Prefiera ejecutar el seed solo una vez o mediante jobs controlados para evitar duplicados.
 
-1. Diagrama documental MongoDB Atlas y modelo logico.
-2. Login admin en Postman.
-3. CRUD de alumnos/promociones/profesores/proyectos.
-4. Login profesor y prueba de permiso: no puede borrar alumnos.
-5. Profesor crea o actualiza nota de un proyecto suyo.
-6. Analiticas devolviendo datos reales.
-7. Swagger UI funcionando.
-8. `npm test` en verde.
+## Estructura de datos y diagramas
+
+Los diagramas de modelo se encuentran en `diagrams/` y proporcionan una representación conceptual y lógica del esquema usado.
+
+## Contribuir
+
+1. Abra un issue para discutir cambios importantes.
+2. Cree ramas por feature/bugfix y envíe Pull Requests con pruebas cuando proceda.
+
+---
+
+Si necesita ayuda para conectar la aplicación a Atlas, ajustar variables de entorno o modificar el comportamiento del `demo-server`, abra un issue o solicítelo aquí y lo preparo.
